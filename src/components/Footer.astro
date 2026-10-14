@@ -1,0 +1,69 @@
+---
+import Icon from './Icon.astro';
+import Mark from './Mark.astro';
+import { contact, collections, features } from '../data/site';
+const year = 2026;
+---
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__top">
+      <div class="ftr__brand">
+        <img src="/img/brand/logo-white.png" alt="HAVOC Watches — Untraceable by Design" width="788" height="220" loading="lazy" />
+      </div>
+      <div class="ftr__cols">
+        <div>
+          <p class="label muted">Shop</p>
+          <ul role="list">{collections.map((c) => <li><a href={`/product-category/${c.slug}`}>{c.name}</a></li>)}<li><a href="/shop">All watches</a></li></ul>
+        </div>
+        <div>
+          <p class="label muted">Features</p>
+          <ul role="list">{features.map((f) => <li><a href={`/${f.slug}`}>{f.nav.filter(Boolean).join(' ')}</a></li>)}</ul>
+        </div>
+        <div>
+          <p class="label muted">HAVOC</p>
+          <ul role="list">
+            <li><a href="/our-story">Our Story</a></li>
+            <li><a href="/havoc-bespoke">Havoc Bespoke</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/privacy-policy">Cookies &amp; Privacy</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="label muted">Contact</p>
+          <ul role="list" class="ftr__contact">
+            <li><a href={contact.phoneHref}><Icon name="phone" size={16} />{contact.phone}</a></li>
+            <li><a href={contact.whatsapp} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />WhatsApp</a></li>
+            <li><a href={`mailto:${contact.email}`}><Icon name="mail" size={16} /><span class="brk">{contact.email}</span></a></li>
+            <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={16} />Instagram</a></li>
+            <li><a href={contact.facebook} target="_blank" rel="noopener"><Icon name="facebook" size={16} />Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="ftr__bottom">
+      <p>Copyright © {year} Havoc Watches</p>
+      <Mark class="ftr__mark" />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr { background: var(--black); border-top: 1px solid var(--line-dark); padding: clamp(56px, 7vw, 96px) 0 calc(28px + env(safe-area-inset-bottom)); }
+  .ftr__top { display: grid; gap: 48px; }
+  .ftr__brand img { width: 220px; height: auto; }
+  .ftr__cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 24px; }
+  .ftr__cols ul { margin: 14px 0 0; display: grid; gap: 8px; }
+  .ftr__cols a { color: var(--text-on-dark); text-decoration: none; font-size: 0.95rem; }
+  .ftr__cols a:hover { color: var(--red-hot); }
+  .ftr__contact a { display: inline-flex; align-items: center; gap: 10px; }
+  .brk { overflow-wrap: anywhere; word-break: normal; }
+  @media (min-width: 1240px) { .brk { overflow-wrap: normal; white-space: nowrap; } }
+  .ftr__bottom { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line-dark); display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted-on-dark); font-size: var(--fs-small); }
+  .ftr__mark { width: 22px; color: var(--red); }
+  @media (min-width: 560px) { .ftr__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1000px) {
+    .ftr__top { grid-template-columns: 300px minmax(0, 1fr); }
+    .ftr__cols { grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.35fr); }
+  }
+  @media (max-width: 899px) { .ftr { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
+</style>

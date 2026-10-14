@@ -1,0 +1,46 @@
+---
+import ProductCard from './ProductCard.astro';
+import { collections, type Product } from '../data/site';
+interface Props { items: Product[]; filters?: boolean }
+const { items, filters = false } = Astro.props;
+---
+<section class="sec paper shopg">
+  <div class="wrap">
+    {filters && (
+      <div class="chips" role="group" aria-label="Filter by collection" data-chips>
+        <button type="button" class="chip is-on" data-f="all" aria-pressed="true">All <span>{items.length}</span></button>
+        {collections.map((c) => <button type="button" class="chip" data-f={c.slug} aria-pressed="false">{c.name} <span>{items.filter((p) => p.cats.includes(c.slug)).length}</span></button>)}
+      </div>
+    )}
+    <p class="label muted shopg__count" aria-live="polite" data-count>Showing all {items.length} results</p>
+    <div class="shopg__grid" data-grid>
+      {items.map((p, i) => <ProductCard p={p} eager={i < 4} />)}
+    </div>
+  </div>
+</section>
+<style>
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { display: inline-flex; gap: 8px; align-items: center; padding: 10px 14px; border: 1px solid var(--line-light); background: transparent; cursor: pointer; font: 600 0.75rem/1 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-on-light); }
+  .chip span { color: var(--muted-on-light); }
+  .chip.is-on { background: var(--text-on-light); color: var(--paper); border-color: var(--text-on-light); }
+  .chip.is-on span { color: rgba(243, 242, 239, 0.7); }
+  .shopg__count { margin-bottom: 24px; }
+  .shopg__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 16px; }
+  .shopg__grid > :global(.is-hidden) { display: none; }
+  @media (min-width: 760px) { .shopg__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 22px; } }
+  @media (min-width: 1200px) { .shopg__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+</style>
+<script>
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-chips] .chip'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-grid] > a'));
+  const count = document.querySelector<HTMLElement>('[data-count]');
+  const apply = (f: string) => {
+    let n = 0;
+    cards.forEach((c) => { const on = f === 'all' || (c.dataset.cats || '').split(' ').includes(f); c.classList.toggle('is-hidden', !on); if (on) n++; });
+    chips.forEach((ch) => { const on = ch.dataset.f === f; ch.classList.toggle('is-on', on); ch.setAttribute('aria-pressed', String(on)); });
+    if (count) count.textContent = f === 'all' ? `Showing all ${n} results` : `Showing ${n} results`;
+  };
+  chips.forEach((ch) => ch.addEventListener('click', () => { apply(ch.dataset.f!); history.replaceState(null, '', ch.dataset.f === 'all' ? location.pathname : `?c=${ch.dataset.f}`); }));
+  const q = new URLSearchParams(location.search).get('c');
+  if (q && chips.some((c) => c.dataset.f === q)) apply(q);
+</script>

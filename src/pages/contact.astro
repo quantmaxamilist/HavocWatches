@@ -1,0 +1,105 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { contact, contactPage, collections, products, seo } from '../data/site';
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY || '';
+const interests = [...collections.map((c) => ({ v: c.slug, l: c.name })), { v: 'bespoke', l: 'Havoc Bespoke' }];
+---
+<Base title={seo.contact.title} description={`${contactPage.heading} — HAVOC Watches. Call ${contact.phone}, WhatsApp or email ${contact.email}.`}>
+  <section class="ct dark">
+    <div class="wrap ct__grid">
+      <div class="ct__info">
+        <nav aria-label="Breadcrumb" class="crumbs label"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{contactPage.title}</span></nav>
+        <h1 class="display fs-hero">{contactPage.heading}</h1>
+        <ul role="list" class="ct__list">
+          <li><a href={contact.phoneHref}><Icon name="phone" size={22} /><span class="label muted">Phone</span><strong>{contact.phone}</strong></a></li>
+          <li><a href={contact.whatsapp} target="_blank" rel="noopener"><Icon name="whatsapp" size={22} /><span class="label muted">WhatsApp</span><strong>{contact.phone}</strong></a></li>
+          <li><a href={`mailto:${contact.email}`}><Icon name="mail" size={22} /><span class="label muted">Email</span><strong class="brk">{contact.email}</strong></a></li>
+          <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={22} /><span class="label muted">Instagram</span><strong>{contact.instagramHandle}</strong></a></li>
+          <li><a href={contact.facebook} target="_blank" rel="noopener"><Icon name="facebook" size={22} /><span class="label muted">Facebook</span><strong>havocwatches26</strong></a></li>
+        </ul>
+      </div>
+
+      <form class="cf" data-cf data-key={key} data-email={contact.email} novalidate>
+        <h2 class="label red">Send an enquiry</h2>
+        <fieldset class="cf__ticks">
+          <legend class="label">I’m interested in</legend>
+          <div class="cf__tickgrid">
+            {interests.map((i) => <label class="tick"><input type="checkbox" name="interest" value={i.l} data-k={i.v} /><span>{i.l}</span></label>)}
+          </div>
+        </fieldset>
+        <label class="cf__f"><span class="label">Watch</span>
+          <select name="watch" data-watch>
+            <option value="">—</option>
+            {products.map((p) => <option value={p.name} data-slug={p.slug}>{p.name}</option>)}
+          </select>
+        </label>
+        <div class="cf__row">
+          <label class="cf__f"><span class="label">Name *</span><input name="name" required autocomplete="name" /></label>
+          <label class="cf__f"><span class="label">Phone</span><input name="phone" type="tel" autocomplete="tel" /></label>
+        </div>
+        <label class="cf__f"><span class="label">Email *</span><input name="email" type="email" required autocomplete="email" /></label>
+        <label class="cf__f"><span class="label">Message *</span><textarea name="message" rows="5" required></textarea></label>
+        <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+        <button class="btn" type="submit">Send enquiry <Icon name="arrow" /></button>
+        <p class="cf__status label" role="status" data-status></p>
+      </form>
+    </div>
+  </section>
+</Base>
+<style>
+  .ct { padding: calc(var(--hdr) + clamp(36px, 5vw, 72px)) 0 clamp(64px, 8vw, 120px); background: radial-gradient(50% 60% at 15% 20%, rgba(159, 30, 33, 0.25), transparent 70%), var(--black); min-height: 100svh; }
+  .ct__grid { display: grid; gap: 48px; }
+  @media (min-width: 1000px) { .ct__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 80px; align-items: start; } }
+  .ct__info { display: grid; gap: 28px; align-content: start; }
+  .crumbs { display: flex; gap: 8px; color: var(--muted-on-dark); }
+  .crumbs a { text-decoration: none; }
+  .ct__list { margin: 0; border-top: 1px solid var(--line-dark); }
+  .ct__list a { display: grid; grid-template-columns: 24px 100px minmax(0, 1fr); gap: 14px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line-dark); text-decoration: none; }
+  .ct__list strong { font: 600 clamp(1rem, 0.95rem + 0.4vw, 1.25rem)/1.25 var(--f-text); }
+  .ct__list a:hover strong { color: var(--red-hot); }
+  .brk { overflow-wrap: anywhere; }
+  @media (max-width: 480px) { .ct__list a { grid-template-columns: 24px minmax(0, 1fr); } .ct__list .label { display: none; } }
+  .cf { display: grid; gap: 18px; padding: clamp(22px, 3vw, 36px); background: var(--ink); border: 1px solid var(--line-dark); }
+  .cf__ticks { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .cf__tickgrid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tick input { position: absolute; opacity: 0; pointer-events: none; }
+  .tick span { display: inline-block; padding: 10px 14px; border: 1px solid var(--line-dark); cursor: pointer; font-size: 0.9rem; }
+  .tick input:checked + span { border-color: var(--red-hot); background: rgba(159, 30, 33, 0.22); }
+  .tick input:focus-visible + span { outline: 2px solid var(--red-hot); outline-offset: 2px; }
+  .cf__row { display: grid; gap: 18px; }
+  @media (min-width: 640px) { .cf__row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+  .cf__f { display: grid; gap: 8px; }
+  .cf__f input, .cf__f textarea, .cf__f select { font: inherit; color: inherit; background: var(--black); border: 1px solid var(--line-dark); padding: 12px 14px; border-radius: var(--radius); width: 100%; }
+  .cf__f select option { color: #000; }
+  .cf__f :is(input, textarea, select):focus { outline: none; border-color: var(--red-hot); }
+  .cf .btn { justify-self: start; }
+  .cf__status:empty { display: none; }
+</style>
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-cf]');
+  if (form) {
+    const qs = new URLSearchParams(location.search);
+    const pk = qs.get('package');
+    if (pk) form.querySelectorAll<HTMLInputElement>('input[name="interest"]').forEach((i) => { if (i.dataset.k === pk) i.checked = true; });
+    const w = qs.get('watch');
+    if (w) { const sel = form.querySelector<HTMLSelectElement>('[data-watch]'); const opt = sel && Array.from(sel.options).find((o) => o.dataset.slug === w); if (opt) opt.selected = true; }
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const fd = new FormData(form);
+      const interests = fd.getAll('interest').join(', ');
+      const body = [`Name: ${fd.get('name')}`, `Email: ${fd.get('email')}`, `Phone: ${fd.get('phone') || '-'}`, `Interested in: ${interests || '-'}`, `Watch: ${fd.get('watch') || '-'}`, '', String(fd.get('message'))].join('\n');
+      const key = form.dataset.key;
+      if (!key) { location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent('Website enquiry')}&body=${encodeURIComponent(body)}`; return; }
+      status.textContent = 'Sending…';
+      try {
+        const r = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ access_key: key, subject: 'Website enquiry — HAVOC Watches', from_name: 'havocwatches.co.uk', botcheck: fd.get('botcheck') ? true : '', name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), interested_in: interests, watch: fd.get('watch'), message: fd.get('message') }) });
+        const j = await r.json();
+        status.textContent = j.success ? 'Thanks — your enquiry has been sent.' : 'Sorry, that didn’t send. Please call or email us.';
+        if (j.success) form.reset();
+      } catch { status.textContent = 'Sorry, that didn’t send. Please call or email us.'; }
+    });
+  }
+</script>

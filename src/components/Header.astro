@@ -1,0 +1,105 @@
+---
+import Icon from './Icon.astro';
+import { nav, contact, collections } from '../data/site';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const active = (href: string) => href !== '/' && (path === href || path.startsWith(href + '/'));
+---
+<header class="hdr" data-hdr>
+  <div class="hdr__in wrap">
+    <a href="/" class="hdr__logo" aria-label="HAVOC Watches — home">
+      <img src="/img/brand/logo-white.png" alt="HAVOC Watches — Untraceable by Design" width="788" height="220" />
+    </a>
+    <nav class="hdr__nav" aria-label="Main">
+      <ul role="list">
+        <li class="has-menu">
+          <a href="/shop" class:list={{ 'is-active': active('/shop') || path.startsWith('/product') }}>Shop</a>
+          <div class="menu">
+            <p class="label muted">Collections</p>
+            <ul role="list">
+              {collections.map((c) => <li><a href={`/product-category/${c.slug}`}>{c.name}</a></li>)}
+              <li><a href="/shop">All watches</a></li>
+            </ul>
+          </div>
+        </li>
+        {nav.slice(1).map((n) => (
+          <li class:list={{ 'has-menu': !!n.children }}>
+            <a href={n.href} class:list={{ 'is-active': active(n.href) }}>{n.label}</a>
+            {n.children && (
+              <div class="menu">
+                <p class="label muted">Features</p>
+                <ul role="list">{n.children.map((c) => <li><a href={c.href}>{c.label}</a></li>)}</ul>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="hdr__cta">
+      <a href={contact.phoneHref} class="hdr__phone label"><Icon name="phone" size={16} />{contact.phone}</a>
+      <a href="/contact" class="btn btn--sm">Get in touch</a>
+      <button class="hdr__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav" data-burger><Icon name="menu" size={24} /></button>
+    </div>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" data-mnav hidden>
+  <div class="mnav__top wrap">
+    <a href="/" class="hdr__logo" aria-label="HAVOC Watches — home"><img src="/img/brand/logo-white.png" alt="" width="788" height="220" /></a>
+    <button class="hdr__burger" aria-label="Close menu" data-burger-close><Icon name="close" size={24} /></button>
+  </div>
+  <nav class="mnav__body wrap" aria-label="Mobile">
+    <a class="mnav__big display" href="/shop">Shop</a>
+    <div class="mnav__sub">{collections.map((c) => <a href={`/product-category/${c.slug}`}>{c.name}</a>)}</div>
+    <a class="mnav__big display" href="/havoc-bespoke">Havoc Bespoke</a>
+    <a class="mnav__big display" href="/our-story">Our Story</a>
+    <p class="label muted mnav__label">Features</p>
+    <div class="mnav__sub">{nav[2].children!.map((c) => <a href={c.href}>{c.label}</a>)}</div>
+    <a class="mnav__big display" href="/contact">Contact</a>
+    <div class="mnav__contact">
+      <a href={contact.phoneHref} class="btn"><Icon name="phone" />{contact.phone}</a>
+      <a href={contact.whatsapp} class="btn btn--ghost" rel="noopener" target="_blank"><Icon name="whatsapp" />WhatsApp</a>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .hdr { position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-header); height: var(--hdr); background: rgba(8, 8, 10, 0.9); border-bottom: 1px solid var(--line-dark); transition: transform 0.35s var(--ease); }
+  .hdr.is-hidden { transform: translate3d(0, -100%, 0); }
+  .hdr__in { height: 100%; display: flex; align-items: center; gap: 24px; }
+  .hdr__logo img { height: 38px; width: auto; }
+  .hdr__nav { margin-left: auto; display: none; }
+  .hdr__nav > ul { display: flex; gap: 4px; margin: 0; }
+  .hdr__nav a { display: block; padding: 10px 12px; text-decoration: none; font: 600 0.78rem/1 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-on-dark); transition: color 0.2s; }
+  .hdr__nav a:hover, .hdr__nav a.is-active { color: var(--text-on-dark); }
+  .hdr__nav a.is-active { box-shadow: inset 0 -2px 0 var(--red-hot); }
+  .has-menu { position: relative; }
+  .menu { position: absolute; top: 100%; left: 0; min-width: 300px; padding: 18px 10px 12px; background: var(--ink); border: 1px solid var(--line-dark); opacity: 0; visibility: hidden; transform: translate3d(0, 6px, 0); transition: opacity 0.2s, transform 0.2s var(--ease), visibility 0.2s; }
+  .menu .label { padding: 0 12px 8px; }
+  .menu ul { margin: 0; }
+  .menu a { text-transform: none; letter-spacing: 0; font: 500 0.95rem/1.3 var(--f-text); color: var(--text-on-dark); padding: 9px 12px; }
+  .menu a:hover { background: var(--char); color: #fff; }
+  .has-menu:hover .menu, .has-menu:focus-within .menu { opacity: 1; visibility: visible; transform: none; }
+  .hdr__cta { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+  .hdr__phone { display: none; align-items: center; gap: 8px; text-decoration: none; color: var(--text-on-dark); white-space: nowrap; }
+  .hdr__phone:hover { color: var(--red-hot); }
+  .hdr__cta .btn { display: none; }
+  .hdr__burger { display: inline-grid; place-items: center; width: 44px; height: 44px; background: none; border: 1px solid var(--line-dark); cursor: pointer; }
+  @media (min-width: 640px) { .hdr__cta .btn { display: inline-flex; } }
+  @media (min-width: 1100px) {
+    .hdr__nav { display: block; }
+    .hdr__cta { margin-left: 8px; }
+    .hdr__burger { display: none; }
+  }
+  @media (min-width: 1280px) { .hdr__phone { display: inline-flex; } }
+
+  .mnav { position: fixed; inset: 0; z-index: var(--z-menu); background: var(--black); overflow-y: auto; }
+  .mnav[hidden] { display: none; }
+  .mnav__top { height: var(--hdr); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line-dark); }
+  .mnav__body { display: grid; gap: 6px; padding-top: 24px; padding-bottom: 40px; }
+  .mnav__big { font-size: clamp(1.75rem, 8vw, 2.5rem); text-decoration: none; padding: 6px 0; }
+  .mnav__big:hover { color: var(--red-hot); }
+  .mnav__sub { display: grid; gap: 2px; padding: 0 0 12px; }
+  .mnav__sub a { color: var(--muted-on-dark); text-decoration: none; padding: 6px 0; }
+  .mnav__label { margin-top: 10px; }
+  .mnav__contact { display: grid; gap: 10px; margin-top: 18px; }
+</style>

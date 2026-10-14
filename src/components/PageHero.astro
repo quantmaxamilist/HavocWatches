@@ -1,0 +1,35 @@
+---
+// Inner-page hero: text-led, no repeated logo watermark. Optional image on the right.
+interface Props { kicker?: string; title: string; lede?: string; image?: { src: string; w: number; h: number; alt: string }; crumbs?: { label: string; href?: string }[] }
+const { kicker, title, lede, image, crumbs = [] } = Astro.props;
+---
+<section class="ph-hero dark">
+  <div class="wrap ph-hero__in" class:list={{ 'has-img': !!image }}>
+    <div class="ph-hero__text">
+      {crumbs.length > 0 && (
+        <nav aria-label="Breadcrumb" class="crumbs label">
+          <a href="/">Home</a>{crumbs.map((c) => <><span aria-hidden="true">/</span>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</>)}
+        </nav>
+      )}
+      {kicker && <p class="label kicker red">{kicker}</p>}
+      <h1 class="display fs-hero">{title}</h1>
+      {lede && <p class="lede ph-hero__lede">{lede}</p>}
+      <slot />
+    </div>
+    {image && (
+      <div class="ph ph-hero__img"><img src={image.src} alt={image.alt} width={image.w} height={image.h} loading="eager" fetchpriority="high" /></div>
+    )}
+  </div>
+</section>
+<style>
+  .ph-hero { padding: calc(var(--hdr) + clamp(40px, 6vw, 88px)) 0 clamp(48px, 6vw, 88px); border-bottom: 1px solid var(--line-dark); background: radial-gradient(60% 80% at 100% 0%, rgba(159, 30, 33, 0.22), transparent 70%), var(--black); }
+  .ph-hero__in { display: grid; gap: 40px; align-items: end; }
+  .ph-hero__text { display: grid; gap: 20px; justify-items: start; }
+  .ph-hero__text .fs-hero { max-width: 16ch; overflow-wrap: anywhere; }
+  .ph-hero__lede { max-width: 60ch; color: var(--muted-on-dark); }
+  .crumbs { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted-on-dark); }
+  .crumbs a { text-decoration: none; }
+  .crumbs a:hover { color: var(--text-on-dark); }
+  .ph-hero__img { aspect-ratio: 4 / 5; max-height: 560px; width: 100%; }
+  @media (min-width: 960px) { .ph-hero__in.has-img { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: 64px; } }
+</style>

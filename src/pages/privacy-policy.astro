@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import privacy from '../data/privacy.json';
+import { seo, contact } from '../data/site';
+const lines = (privacy as string[]).slice(1); // first line is the "Privacy Policy" heading
+const isH = (x: string) => /^\d+\.\s/.test(x) || /^(Privacy Policy|Cookie Policy|Cookies Policy|Terms (&|and) Conditions)$/i.test(x);
+const isSub = (x: string) => !isH(x) && x.length < 60 && !/[.;:,]$/.test(x) && !/^Last updated/i.test(x) && /^[A-Z]/.test(x);
+const fix = (x: string) => x.replace('havoc watches26@gmail.com', contact.email);
+---
+<Base title={seo['privacy-policy'].title} description={seo['privacy-policy'].desc.slice(0, 158)}>
+  <PageHero title="Privacy • Cookies • Terms & Conditions" crumbs={[{ label: 'Privacy • Cookies • Terms & Conditions' }]} />
+  <section class="sec paper">
+    <div class="wrap pv">
+      <h2 class="display fs-d3">Privacy Policy</h2>
+      {lines.map((x) => isH(x) ? <h2 class="pv__h">{fix(x)}</h2> : isSub(x) ? <h3 class="pv__s">{fix(x)}</h3> : <p>{fix(x)}</p>)}
+    </div>
+  </section>
+</Base>
+<style>
+  .pv { display: grid; gap: 14px; max-width: 78ch; }
+  .pv__h { font: 800 1.35rem/1.2 var(--f-display); text-transform: uppercase; font-variation-settings: 'wdth' 115; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line-light); }
+  .pv__s { font: 700 1.02rem/1.3 var(--f-text); margin-top: 8px; }
+</style>

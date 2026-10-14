@@ -1,0 +1,146 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/product/havoc-challenger-gmt-copy",
+      "destination": "/product/havoc-challenger-gmt",
+      "permanent": true
+    },
+    {
+      "source": "/product/havoc-challenger-gmt-copy/",
+      "destination": "/product/havoc-challenger-gmt",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/lume",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/lume/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/316l-stainless-steel",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/316l-stainless-steel/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/bronze",
+      "destination": "/product/havocss80-broughsuperior",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/bronze/",
+      "destination": "/product/havocss80-broughsuperior",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/titanium",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/titanium/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/carbon",
+      "destination": "/product/havoc-stealth-carbon",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/carbon/",
+      "destination": "/product/havoc-stealth-carbon",
+      "permanent": true
+    },
+    {
+      "source": "/cart",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/cart/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/checkout",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/checkout/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/my-account",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/my-account/",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/wishlist",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/wishlist/",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/error",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/error/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap.rss",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/page-sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/product-sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/product_cat-sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/product_tag-sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    },
+    {
+      "source": "/wp-sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": true
+    }
+  ]
+}

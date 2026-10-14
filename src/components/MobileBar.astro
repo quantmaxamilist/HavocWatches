@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import { contact } from '../data/site';
+---
+<div class="mbar" aria-label="Quick contact">
+  <a href={contact.phoneHref}><Icon name="phone" size={18} /><span>Call</span></a>
+  <a href={contact.whatsapp} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} /><span>WhatsApp</span></a>
+  <a href="/shop"><Icon name="arrow" size={18} /><span>Shop</span></a>
+  <a href="/contact" class="mbar__cta"><span>Enquire</span></a>
+</div>
+<style>
+  .mbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.3fr); background: rgba(8, 8, 10, 0.94); border-top: 1px solid var(--line-dark); padding-bottom: env(safe-area-inset-bottom); }
+  .mbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 58px; text-decoration: none; font: 600 0.66rem/1 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-on-dark); }
+  .mbar a + a { border-left: 1px solid var(--line-dark); }
+  .mbar .mbar__cta { background: var(--red); font-size: 0.74rem; }
+  @media (min-width: 900px) { .mbar { display: none; } }
+</style>

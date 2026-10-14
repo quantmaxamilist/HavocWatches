@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import EnquiryBand from '../components/EnquiryBand.astro';
+import { features, articles, productBySlug, price, seo, type FeatureSlug } from '../data/site';
+export function getStaticPaths() { return features.map((f) => ({ params: { feature: f.slug }, props: { f } })); }
+const { f } = Astro.props as { f: (typeof features)[number] };
+const blocks = articles[f.slug as FeatureSlug];
+const ledes = blocks.filter((b: any) => b.k === 'lede');
+const body = blocks.filter((b: any) => b.k !== 'lede');
+const p = productBySlug(f.product);
+const s = seo[f.slug];
+let fig = 0;
+// insert the product promo roughly half way through the article (it sat mid-page on the old site too)
+const mid = Math.floor(body.length / 2);
+let promoAt = body.findIndex((b: any, i: number) => i >= mid && b.k === 'h');
+if (promoAt < 0) promoAt = mid;
+---
+<Base title={s.title} description={ledes[0]?.x?.slice(0, 158) ?? s.desc} image={f.image}>
+  <section class="ft-hero dark">
+    <div class="wrap ft-hero__grid">
+      <div class="ft-hero__copy">
+        <nav aria-label="Breadcrumb" class="crumbs label"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/#features">Features</a><span aria-hidden="true">/</span><span aria-current="page">{f.nav[0].replace(/:$/, '')}</span></nav>
+        <h1 class="display fs-hero ft-title">{f.nav[0]} {f.nav[1] && <span class="red">{f.nav[1]}</span>}</h1>
+        {ledes.map((l: any, i: number) => <p class:list={[i === 0 && l.x.length < 200 ? 'statement' : i === 0 ? 'lede ft-lede1' : 'lede muted']}>{l.x}</p>)}
+      </div>
+      {f.badge && <img class="ft-badge" src={f.badge.src} alt={f.badge.alt} width={f.badge.w} height={f.badge.h} fetchpriority="high" />}
+    </div>
+  </section>
+
+  <article class="sec paper ft">
+    <div class="wrap ft__grid">
+      <aside class="ft__aside" aria-label={p.name}>
+        <a href={`/product/${p.slug}`} class="ft-prod">
+          <div class="ph ft-prod__img"><img src={p.images[0]} alt={p.name} width="1024" height="1536" loading="lazy" decoding="async" /></div>
+          <p class="label red">{f.productLabel}</p>
+          <p class="ft-prod__name display">{p.name}</p>
+          <p class="ft-prod__price">{price(p.price)}</p>
+          <span class="link-arrow">Find out more <Icon name="arrow" size={16} /></span>
+        </a>
+      </aside>
+      <div class="ft__body">
+        {body.map((b: any, i: number) => (
+          <>
+            {i === promoAt && (
+              <a href={`/product/${p.slug}`} class="ft-inline">
+                <div class="ph ft-inline__img"><img src={f.image} alt="" width="1024" height="1536" loading="lazy" decoding="async" /></div>
+                <div><p class="label red">{f.productLabel}</p><p class="display ft-inline__t">{p.name}</p><span class="link-arrow">Find out more <Icon name="arrow" size={16} /></span></div>
+              </a>
+            )}
+            {b.k === 'h' && <h2 class="display ft-h">{b.x}</h2>}
+            {b.k === 'sub' && <p class="ft-sub">{b.x}</p>}
+            {b.k === 'p' && <p>{b.x}</p>}
+            {b.k === 'li' && <p class="ft-li">{b.x}</p>}
+            {b.k === 'pull' && <p class="ft-pull">{b.x}</p>}
+            {b.k === 'quote' && (
+              <figure class="ft-quote"><blockquote class="statement">{b.q}</blockquote><figcaption><span class="label red">{b.by}</span>{b.sub && <span class="label muted"> — {b.sub}</span>}</figcaption></figure>
+            )}
+            {b.k === 'link' && <p><a href={b.href} target="_blank" rel="noopener" class="ft-link">{b.x}</a></p>}
+            {b.k === 'spec' && (
+              <dl class="ft-spec">{b.rows.map((r: string[]) => <div><dt>{r[0]}</dt><dd>{r[1]}</dd></div>)}</dl>
+            )}
+            {b.k === 'figure' && f.figure && f.figure[fig] && (() => { const im = f.figure![fig++]; return (
+              <figure class="ft-fig"><div class="ph no-shade"><img src={im.src} alt={im.caption} width={im.w} height={im.h} loading="lazy" decoding="async" /></div><figcaption class="label muted">{im.caption}</figcaption></figure>
+            ); })()}
+          </>
+        ))}
+        <a href={`/product/${p.slug}`} class="btn ft-cta">{p.name} — Find out more <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </article>
+
+  <nav class="sec light ft-next" aria-label="More features">
+    <div class="wrap">
+      <p class="label kicker">Features</p>
+      <ul role="list" class="ft-next__list">
+        {features.filter((x) => x.slug !== f.slug).map((x) => (
+          <li><a href={`/${x.slug}`}><span>{x.nav.filter(Boolean).join(' ')}</span><Icon name="arrow" size={18} /></a></li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+  <EnquiryBand />
+</Base>
+<style>
+  .ft-hero { padding: calc(var(--hdr) + clamp(36px, 5vw, 72px)) 0 clamp(48px, 6vw, 88px); background: radial-gradient(55% 70% at 85% 30%, rgba(159, 30, 33, 0.25), transparent 70%), var(--black); }
+  .ft-hero__grid { display: grid; gap: 32px; align-items: center; }
+  .ft-hero__copy { display: grid; gap: 22px; min-width: 0; }
+  .ft-title { max-width: 18ch; }
+  .ft-title .red { display: block; }
+  .ft-hero__copy .statement { max-width: 46ch; }
+  .ft-hero__copy .lede { max-width: 66ch; }
+  .ft-lede1 { font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem); color: var(--text-on-dark); }
+  .crumbs { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted-on-dark); }
+  .crumbs a { text-decoration: none; }
+  .ft-badge { width: min(240px, 50vw); height: auto; justify-self: start; filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5)); }
+  @media (min-width: 960px) { .ft-hero__grid { grid-template-columns: minmax(0, 1fr) auto; gap: 72px; } .ft-badge { width: 260px; justify-self: end; } }
+  .ft__grid { display: grid; gap: 40px; }
+  .ft__aside { display: none; }
+  @media (min-width: 1100px) { .ft__grid { grid-template-columns: 280px minmax(0, 1fr); gap: 80px; } .ft__aside { display: block; } .ft-prod { position: sticky; top: calc(var(--hdr) + 28px); } }
+  .ft-prod { display: grid; gap: 10px; text-decoration: none; color: inherit; }
+  .ft-prod__img { aspect-ratio: 2 / 3; margin-bottom: 6px; }
+  .ft-prod__name { font-size: 1.3rem; }
+  .ft-prod__price { font: 500 1rem/1 var(--f-mono); }
+  .ft__body { display: grid; gap: 18px; max-width: 70ch; font-size: 1.04rem; line-height: 1.75; }
+  .ft-h { font-size: var(--fs-display-3); margin-top: 28px; line-height: 1; }
+  .ft-sub { font: 700 1.15rem/1.4 var(--f-text); }
+  .ft-li { padding-left: 16px; border-left: 2px solid var(--red); font-weight: 600; }
+  .ft-pull { font: 600 var(--fs-statement)/1.3 var(--f-display); color: var(--red); padding: 8px 0; }
+  .ft-quote { margin: 20px 0; padding: clamp(24px, 3vw, 40px); background: var(--black); color: var(--text-on-dark); display: grid; gap: 18px; border-left: 4px solid var(--red-hot); }
+  .ft-link { color: var(--red); font-weight: 600; }
+  .ft-spec { margin: 8px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line-light); border: 1px solid var(--line-light); }
+  .ft-spec div { background: var(--paper); padding: 14px; display: grid; gap: 4px; }
+  .ft-spec dt { font: 500 0.72rem/1.2 var(--f-mono); letter-spacing: 0.12em; color: var(--muted-on-light); }
+  .ft-spec dd { margin: 0; font-weight: 700; }
+  @media (min-width: 700px) { .ft-spec { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .ft-fig { margin: 12px 0; display: grid; gap: 10px; }
+  .ft-fig .ph { aspect-ratio: 4 / 3; }
+  .ft-inline { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: center; padding: 16px; margin: 16px 0; background: var(--steel); text-decoration: none; color: inherit; }
+  .ft-inline__img { aspect-ratio: 2 / 3; }
+  .ft-inline__t { font-size: 1.4rem; margin: 6px 0 10px; }
+  .ft-cta { justify-self: start; margin-top: 24px; white-space: normal; text-align: left; }
+  .ft-next__list { margin: 18px 0 0; display: grid; gap: 0; border-top: 1px solid var(--line-light); }
+  .ft-next__list a { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line-light); text-decoration: none; font: 800 clamp(1.05rem, 0.9rem + 0.7vw, 1.5rem)/1.1 var(--f-display); text-transform: uppercase; font-variation-settings: 'wdth' 115; }
+  .ft-next__list a:hover { color: var(--red); }
+  @media (min-width: 900px) { .ft-next__list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } }
+</style>

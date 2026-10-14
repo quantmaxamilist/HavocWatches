@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ShopGrid from '../../components/ShopGrid.astro';
+import EnquiryBand from '../../components/EnquiryBand.astro';
+import { collections, inCollection, seo } from '../../data/site';
+export function getStaticPaths() { return collections.map((c) => ({ params: { cat: c.slug }, props: { c } })); }
+const { c } = Astro.props as { c: (typeof collections)[number] };
+const items = inCollection(c.slug);
+---
+<Base title={seo[`product-category__${c.slug}`]?.title ?? `${c.name} - Havoc Watches`} description={c.text}>
+  <PageHero kicker={`${c.label} — ${c.title}`} title={c.name} lede={c.text} crumbs={[{ label: 'Shop', href: '/shop' }, { label: c.name }]} />
+  <ShopGrid items={items} />
+  <EnquiryBand />
+</Base>

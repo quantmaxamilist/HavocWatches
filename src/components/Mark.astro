@@ -1,0 +1,6 @@
+---
+// HAVOC arrowhead mark, traced from the client's favicon file (cropped-favicon2.png)
+interface Props { class?: string; title?: string }
+const { class: cls, title } = Astro.props;
+---
+<svg class={cls} viewBox="0 0 386 446" fill="currentColor" role={title ? 'img' : undefined} aria-hidden={title ? undefined : 'true'}>{title && <title>{title}</title>}<path d="M192,0 L186,17 L151,95 L152,96 L183,81 L186,82 L175,246 L130,247 L129,245 L171,189 L131,188 L130,186 L176,100 L58,210 L111,209 L32,286 L95,279 L105,280 L0,440 L66,428 L69,426 L173,258 L174,272 L162,445 L222,445 L210,268 L211,257 L316,426 L319,428 L385,440 L280,280 L290,279 L353,286 L274,209 L327,210 L209,100 L255,186 L254,188 L214,189 L256,245 L255,247 L209,246 L198,82 L201,81 L234,96Z"/></svg>

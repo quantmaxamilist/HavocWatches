@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Mark from '../components/Mark.astro';
+import { contact } from '../data/site';
+---
+<Base title="Page not found - Havoc Watches" description="Page not found.">
+  <section class="nf dark">
+    <Mark class="nf__mark" />
+    <div class="wrap nf__in">
+      <p class="label red">404</p>
+      <h1 class="display fs-hero">Page not found.</h1>
+      <div class="nf__ctas">
+        <a href="/shop" class="btn">Visit store <Icon name="arrow" /></a>
+        <a href="/" class="btn btn--ghost">Home</a>
+        <a href={contact.phoneHref} class="btn btn--ghost"><Icon name="phone" /> {contact.phone}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 100svh; display: grid; align-items: center; padding: calc(var(--hdr) + 40px) 0 80px; position: relative; overflow: hidden; }
+  .nf__mark { position: absolute; right: -5%; top: 50%; height: 110%; transform: translateY(-50%); color: rgba(159, 30, 33, 0.16); }
+  .nf__in { position: relative; display: grid; gap: 22px; justify-items: start; }
+  .nf__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+</style>

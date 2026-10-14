@@ -1,0 +1,101 @@
+---
+// Signature moment: a HAVOC watch assembles itself in 3D (≈2.4s) when half on screen.
+// The four bespoke elements named on the old homepage are listed beside it.
+import Icon from './Icon.astro';
+import { bespokeTeaser as b } from '../data/site';
+---
+<section class="wb dark" id="bespoke-build" aria-labelledby="wb-h">
+  <div class="wrap wb__grid">
+    <div class="wb__copy">
+      <p class="label kicker red" data-reveal>Havoc Bespoke</p>
+      <h2 id="wb-h" class="display fs-d2" data-reveal>{b.title}</h2>
+      <p class="lede" data-reveal>{b.p1}</p>
+      <p class="muted" data-reveal>{b.p2}</p>
+      <a href="/havoc-bespoke" class="btn" data-reveal>{b.cta} <Icon name="arrow" /></a>
+    </div>
+
+    <div class="wb__stage" data-wb>
+      <div class="wb__canvas" data-wb-canvas>
+        <img class="wb__poster" src="/img/wow-poster.webp" alt="A HAVOC watch shown assembled: case, bezel, dial, logo and hands" width="1000" height="1000" loading="lazy" decoding="async" data-wb-poster />
+      </div>
+      <button class="wb__replay label" type="button" data-wb-replay hidden><Icon name="replay" size={16} />Replay</button>
+    </div>
+
+    <ol class="wb__list" role="list" data-wb-list>
+      {b.parts.map((p, i) => (
+        <li>
+          <a href="/havoc-bespoke" data-part={p.key}>
+            <span class="wb__n label">0{i + 1}</span>
+            <span class="wb__name">{p.label}</span>
+            <span class="wb__words muted">{p.words}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .wb { overflow: hidden; background: radial-gradient(50% 60% at 62% 45%, rgba(159, 30, 33, 0.28), transparent 70%), var(--black); padding: var(--sec) 0; }
+  .wb__grid { display: grid; gap: 36px; grid-template-columns: minmax(0, 1fr); }
+  .wb__copy { display: grid; gap: 20px; justify-items: start; align-content: center; }
+  .wb__copy .muted { max-width: 52ch; }
+  .wb__stage { position: relative; width: 100%; max-width: 640px; justify-self: center; aspect-ratio: 1; }
+  .wb__canvas { position: absolute; inset: 0; }
+  .wb__canvas :global(canvas) { width: 100% !important; height: 100% !important; touch-action: pan-y; }
+  .wb__poster { width: 100%; height: 100%; object-fit: contain; }
+  .wb.has-gl .wb__poster, .wb.gl-pending .wb__poster { display: none; }
+  :global(.js) .wb.gl-pending .wb__list { opacity: 0; }
+  .wb__replay { position: absolute; right: 0; bottom: 0; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(15, 15, 18, 0.8); border: 1px solid var(--line-dark); color: var(--text-on-dark); cursor: pointer; opacity: 0; transition: opacity 0.4s var(--ease); }
+  .wb__replay.is-on { opacity: 1; }
+  .wb__replay:hover { border-color: var(--red-hot); color: #fff; }
+  .wb__list { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line-dark); transition: opacity 0.5s var(--ease); }
+  :global(.js) .wb.has-gl .wb__list { opacity: 0; }
+  :global(.js) .wb.has-gl .wb__list.is-on { opacity: 1; }
+  .wb__list li { border-bottom: 1px solid var(--line-dark); }
+  .wb__list li:nth-child(odd) { border-right: 1px solid var(--line-dark); }
+  .wb__list a { display: grid; gap: 6px; padding: 18px 16px 18px 0; text-decoration: none; height: 100%; transition: background-color 0.2s; }
+  .wb__list li:nth-child(even) a { padding-left: 16px; }
+  .wb__n { color: var(--red-hot); }
+  .wb__name { font: 800 1.15rem/1 var(--f-display); text-transform: uppercase; font-variation-settings: 'wdth' 125; }
+  .wb__words { font-size: 0.88rem; line-height: 1.4; }
+  .wb__list a:hover, .wb__list a.is-hl { background: rgba(159, 30, 33, 0.16); }
+  .wb__list a.is-hl .wb__name { color: var(--red-hot); }
+  @media (min-width: 1000px) {
+    .wb__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.55fr); align-items: center; gap: 40px; }
+    .wb__list { grid-template-columns: minmax(0, 1fr); border-top: 0; }
+    .wb__list li:nth-child(odd) { border-right: 0; }
+    .wb__list li { border-bottom: 0; border-left: 1px solid var(--line-dark); }
+    .wb__list a, .wb__list li:nth-child(even) a { padding: 16px 0 16px 20px; }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('.wb');
+  const stage = document.querySelector<HTMLElement>('[data-wb]');
+  const list = document.querySelector<HTMLElement>('[data-wb-list]');
+  const replay = document.querySelector<HTMLButtonElement>('[data-wb-replay]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function hasWebGL() {
+    try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; }
+  }
+
+  if (section && stage && list && replay && !reduce && hasWebGL() && !new URLSearchParams(location.search).has('nogl')) {
+    section.classList.add('gl-pending');
+    const fail = () => { section.classList.remove('gl-pending', 'has-gl'); };
+    let started = false;
+    const near = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting) && !started) {
+        started = true; near.disconnect();
+        const go = () => {
+          // if the 3D isn't ready within 10s on a slow device, fall back to the still image + list
+          const guard = setTimeout(() => { if (!section.classList.contains('has-gl')) { section.dataset.abort = '1'; fail(); } }, 10000);
+          import('../scripts/watch3d').then((m) => m.mountWatch({ section, stage, list, replay, onReady: () => clearTimeout(guard) })).catch(() => { clearTimeout(guard); fail(); });
+        };
+        ('requestIdleCallback' in window) ? (window as any).requestIdleCallback(go, { timeout: 800 }) : setTimeout(go, 200);
+      }
+    }, { rootMargin: '1600px 0px' });
+    near.observe(section);
+  }
+</script>

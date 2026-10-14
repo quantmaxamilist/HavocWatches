@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import Mark from './Mark.astro';
+import { contact } from '../data/site';
+interface Props { heading?: string; text?: string }
+// Defaults are the old site's own lines (Havoc Bespoke page close).
+const { heading = 'GET IN TOUCH', text = 'Contact us today and begin creating a timepiece that truly represents your organisation.' } = Astro.props;
+---
+<section class="eb redband" aria-labelledby="eb-h">
+  <Mark class="eb__mark" />
+  <div class="wrap eb__in">
+    <div>
+      <p class="label eb__label">HAVOC Watches</p>
+      <h2 id="eb-h" class="display fs-d2">{heading}</h2>
+      <p class="eb__text">{text}</p>
+    </div>
+    <div class="eb__links">
+      <a href={contact.phoneHref} class="eb__row"><Icon name="phone" size={22} /><span class="label">Call</span><strong>{contact.phone}</strong></a>
+      <a href={contact.whatsapp} class="eb__row" target="_blank" rel="noopener"><Icon name="whatsapp" size={22} /><span class="label">WhatsApp</span><strong>Message us</strong></a>
+      <a href={`mailto:${contact.email}`} class="eb__row"><Icon name="mail" size={22} /><span class="label">Email</span><strong class="brk">{contact.email}</strong></a>
+      <a href="/contact" class="btn btn--white">Send an enquiry <Icon name="arrow" /></a>
+    </div>
+  </div>
+</section>
+<style>
+  .eb { position: relative; overflow: hidden; padding: clamp(64px, 8vw, 120px) 0; }
+  .eb__mark { position: absolute; right: -4%; top: 50%; width: min(46vw, 520px); transform: translateY(-50%); color: rgba(0, 0, 0, 0.16); pointer-events: none; }
+  .eb__in { position: relative; display: grid; gap: 40px; align-items: end; }
+  .eb__label { color: rgba(255, 255, 255, 0.75); margin-bottom: 18px; }
+  .eb__text { margin-top: 18px; max-width: 46ch; color: rgba(255, 255, 255, 0.85); }
+  .eb__links { display: grid; gap: 10px; }
+  .eb__row { display: grid; grid-template-columns: 24px 96px minmax(0, 1fr); align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.25); text-decoration: none; }
+  .eb__row strong { font: 600 clamp(1rem, 0.9rem + 0.5vw, 1.25rem)/1.2 var(--f-text); }
+  .eb__row:hover strong { text-decoration: underline; text-underline-offset: 4px; }
+  .eb__links .btn { margin-top: 14px; justify-self: start; }
+  .brk { overflow-wrap: anywhere; }
+  @media (min-width: 960px) { .eb__in { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 80px; } }
+  @media (max-width: 480px) { .eb__row { grid-template-columns: 24px minmax(0, 1fr); } .eb__row .label { display: none; } }
+</style>

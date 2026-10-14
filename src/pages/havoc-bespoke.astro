@@ -1,0 +1,94 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import EnquiryBand from '../components/EnquiryBand.astro';
+import { bespoke as b, contact, seo } from '../data/site';
+const mail = `mailto:${contact.email}?subject=${encodeURIComponent('Start the Havoc Bespoke Journey')}`;
+---
+<Base title={seo['havoc-bespoke'].title} description={b.intro[1]} image={b.images[0].src}>
+  <section class="bs-hero dark">
+    <div class="wrap bs-hero__grid">
+      <div class="bs-hero__copy">
+        <nav aria-label="Breadcrumb" class="crumbs label"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{b.title}</span></nav>
+        <p class="label kicker red">{b.kicker}</p>
+        <h1 class="display fs-hero">{b.title}</h1>
+        <p class="statement">{b.intro[0]}</p>
+        <div class="bs-ctas">
+          <a href="/contact?package=bespoke" class="btn">{b.startCta} <Icon name="arrow" /></a>
+          <a href={contact.phoneHref} class="btn btn--ghost"><Icon name="phone" /> {contact.phone}</a>
+        </div>
+      </div>
+      <div class="ph bs-hero__img"><img src={b.images[0].src} alt="HAVOC watches on the design bench with drawings and parts" width={b.images[0].w} height={b.images[0].h} fetchpriority="high" /></div>
+    </div>
+  </section>
+
+  <section class="sec paper">
+    <div class="wrap bs-intro">
+      <p class="statement" data-reveal>{b.intro[2]}</p>
+      <div class="bs-intro__body">
+        <p class="lede" data-reveal>{b.intro[1]}</p>
+        <p data-reveal>{b.intro[3]}</p>
+        <p data-reveal>{b.intro[4]}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec dark bs-proc" aria-labelledby="proc-h">
+    <div class="wrap">
+      <h2 id="proc-h" class="display fs-d2" data-reveal>{b.processTitle}</h2>
+      <ol class="steps" role="list">
+        {b.steps.map((s) => (
+          <li class="step" data-reveal>
+            <span class="step__n display">{s.n}</span>
+            <div class="step__body">
+              <h3 class="step__t">{s.title}</h3>
+              <p class="lede">{s.p[0]}</p>
+              {s.p.slice(1).map((x) => <p class="muted">{x}</p>)}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec light bs-close">
+    <div class="wrap bs-close__grid">
+      <div class="bs-close__imgs">
+        {b.images.slice(1).map((im) => <div class="ph"><img src={im.src} alt="HAVOC bespoke watch with technical drawings" width={im.w} height={im.h} loading="lazy" decoding="async" /></div>)}
+      </div>
+      <div class="bs-close__copy">
+        <h2 class="display fs-d3" data-reveal>{b.closeTitle}</h2>
+        {b.close.map((x) => <p data-reveal>{x}</p>)}
+        <div class="bs-ctas" data-reveal>
+          <a href="/contact?package=bespoke" class="btn">{b.closeCta} <Icon name="arrow" /></a>
+          <a href={mail} class="btn btn--ghost"><Icon name="mail" /> Email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <EnquiryBand />
+</Base>
+<style>
+  .bs-hero { padding: calc(var(--hdr) + clamp(36px, 5vw, 72px)) 0 clamp(56px, 7vw, 96px); background: radial-gradient(50% 60% at 80% 40%, rgba(159, 30, 33, 0.28), transparent 70%), var(--black); }
+  .bs-hero__grid { display: grid; gap: 40px; align-items: center; }
+  .bs-hero__copy { display: grid; gap: 22px; justify-items: start; min-width: 0; }
+  .crumbs { display: flex; gap: 8px; color: var(--muted-on-dark); }
+  .crumbs a { text-decoration: none; }
+  .bs-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  .bs-hero__img { aspect-ratio: 1; }
+  @media (min-width: 960px) { .bs-hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; } }
+  .bs-intro { display: grid; gap: 28px; }
+  .bs-intro__body { display: grid; gap: 18px; max-width: 62ch; }
+  @media (min-width: 960px) { .bs-intro { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: 72px; } }
+  .steps { margin: clamp(32px, 5vw, 64px) 0 0; display: grid; gap: 0; border-top: 1px solid var(--line-dark); }
+  .step { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 20px; padding: clamp(28px, 4vw, 48px) 0; border-bottom: 1px solid var(--line-dark); }
+  .step__n { font-size: var(--fs-display-2); color: var(--red-hot); line-height: 0.85; }
+  .step__body { display: grid; gap: 14px; max-width: 70ch; }
+  .step__t { font: 800 var(--fs-display-3)/1 var(--f-display); text-transform: uppercase; font-variation-settings: 'wdth' 125; }
+  @media (min-width: 960px) { .step { grid-template-columns: minmax(0, 0.35fr) minmax(0, 1fr); } }
+  .bs-close__grid { display: grid; gap: 40px; align-items: center; }
+  .bs-close__imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .bs-close__imgs .ph { aspect-ratio: 1; }
+  .bs-close__copy { display: grid; gap: 18px; justify-items: start; }
+  @media (min-width: 960px) { .bs-close__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; } }
+</style>

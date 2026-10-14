@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ShopGrid from '../components/ShopGrid.astro';
+import EnquiryBand from '../components/EnquiryBand.astro';
+import { products, fullRange, seo } from '../data/site';
+---
+<Base title={seo.shop.title} description={fullRange.text}>
+  <PageHero kicker="HAVOC Watches" title="Shop" lede={fullRange.text} crumbs={[{ label: 'Shop' }]} />
+  <ShopGrid items={products} filters />
+  <EnquiryBand />
+</Base>

@@ -1,0 +1,289 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Mark from '../components/Mark.astro';
+import ProductCard from '../components/ProductCard.astro';
+import WatchBuild from '../components/WatchBuild.astro';
+import EnquiryBand from '../components/EnquiryBand.astro';
+import { brand, heroSlides, collections, founder, fullRange, testimonials, instagramBand, features, products, productBySlug, contact, inCollection } from '../data/site';
+const [s1, s2] = heroSlides;
+---
+<Base title={brand.homeTitle} description={brand.homeDesc}>
+  <!-- HERO -->
+  <section class="hero dark" data-hero>
+    <div class="hero__bg" aria-hidden="true"><Mark class="hero__mark" /></div>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="label kicker red hero__in" style="--i:0">{s1.kicker}</p>
+        <h1 class="display fs-hero hero__title hero__in" style="--i:1"><span>{s1.line1}</span> <span class="red">{s1.line2}</span></h1>
+        <p class="label hero__sub hero__in" style="--i:2">{s1.sub}</p>
+        <div class="hero__ctas hero__in" style="--i:3">
+          <a href="/shop" class="btn">{s1.cta} <Icon name="arrow" /></a>
+          <a href="/havoc-bespoke" class="btn btn--ghost">Havoc Bespoke</a>
+        </div>
+        <a href={contact.phoneHref} class="hero__phone label hero__in" style="--i:4"><Icon name="phone" size={16} /> {contact.phone}</a>
+      </div>
+      <div class="hero__media">
+        <div class="ph hero__img hero__img--a"><img src="/img/2026/06/stealth1.webp" alt="HAVOC Stealth with grey dial and red seconds hand" width="1024" height="1536" fetchpriority="high" /></div>
+        <div class="ph hero__img hero__img--b"><img src="/img/2026/07/jtac2.webp" alt="HAVOC JTAC on the wrist in the desert" width="1024" height="1536" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECOND HERO LINE (old slide 2) -->
+  <section class="slide2 ink" aria-label={`${s2.line1} ${s2.line2}`}>
+    <div class="wrap slide2__in">
+      <p class="display slide2__t">{s2.line1} {s2.line2}</p>
+      <p class="label muted">{s2.sub}</p>
+      <a href="/shop" class="link-arrow">{s2.cta} <Icon name="arrow" size={16} /></a>
+    </div>
+  </section>
+
+  <!-- COLLECTIONS -->
+  <section class="sec light cols" aria-labelledby="cols-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label kicker" data-reveal>Collections</p>
+        <h2 id="cols-h" class="display fs-d2" data-reveal>{fullRange.title}</h2>
+      </div>
+      <div class="cols__grid">
+        {collections.map((c, i) => (
+          <a href={`/product-category/${c.slug}`} class="col hover-zoom" data-reveal data-delay={i * 80}>
+            <div class="ph col__img"><img src={c.image} alt="" width="1024" height="1536" loading="lazy" decoding="async" /></div>
+            <div class="col__body">
+              <p class="label red">{c.label}</p>
+              <h3 class="display fs-d3">{c.title}</h3>
+              <p class="muted">{c.text}</p>
+              <span class="link-arrow">{c.cta} <span class="col__n label">{inCollection(c.slug).length} watches</span><Icon name="arrow" size={16} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WOW: 3D assembly -->
+  <WatchBuild />
+
+  <!-- FULL RANGE -->
+  <section class="sec paper range" aria-labelledby="range-h">
+    <div class="wrap range__head">
+      <div>
+        <p class="label kicker" data-reveal>Shop</p>
+        <h2 id="range-h" class="display fs-d2" data-reveal>{products.length} watches</h2>
+      </div>
+      <div class="range__aside" data-reveal>
+        <p class="lede">{fullRange.text}</p>
+        <a href="/shop" class="btn btn--ghost">Visit store <Icon name="arrow" /></a>
+      </div>
+    </div>
+    <div class="strip range__strip" data-drag>
+      {products.map((p) => <ProductCard p={p} sizes="(min-width: 1100px) 22vw, 60vw" />)}
+    </div>
+  </section>
+
+  <!-- FOUNDER -->
+  <section class="sec ink founder" aria-labelledby="f-h">
+    <div class="wrap founder__grid">
+      <figure class="founder__photo" data-reveal>
+        <img src={founder.photo.src} alt={founder.photo.alt} width={founder.photo.w} height={founder.photo.h} loading="lazy" decoding="async" />
+      </figure>
+      <div class="founder__copy">
+        <p id="f-h" class="label kicker red" data-reveal>{founder.label}</p>
+        <blockquote class="statement founder__q" data-reveal>{founder.quote}</blockquote>
+        <div class="founder__by" data-reveal>
+          <p class="founder__name">{founder.name}</p>
+          <p class="label muted">{founder.role}</p>
+        </div>
+        <a href="/our-story" class="btn btn--ghost" data-reveal>{founder.cta} <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="sec light tst" aria-labelledby="tst-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label kicker" data-reveal>Testimonials</p>
+        <h2 id="tst-h" class="sr-only">Testimonials</h2>
+      </div>
+      <div class="tst__grid">
+        {testimonials.map((t, i) => (
+          <figure class="tcard" data-reveal data-delay={i * 70}>
+            <p class="label red">{t.title}</p>
+            <blockquote class="tcard__q">{t.pre && <>{t.pre}{' '}</>}<a href={`/product/${t.slug}`}>{t.product}</a>{' '}{t.post}</blockquote>
+            <figcaption class="tcard__by"><span>{t.who}</span><span class="label">{t.unit}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="sec dark feats" id="features" aria-labelledby="feats-h">
+    <div class="wrap feats__grid">
+      <div class="feats__sticky" aria-hidden="true">
+        {features.map((f, i) => (
+          <div class="ph feats__img" data-feat-img={f.slug} class:list={{ 'is-on': i === 0 }}><img src={f.image} alt="" width="1024" height="1536" loading="lazy" decoding="async" /></div>
+        ))}
+      </div>
+      <div>
+        <p class="label kicker red" data-reveal>Features</p>
+        <h2 id="feats-h" class="sr-only">Features</h2>
+        <ol class="feats__list" role="list">
+          {features.map((f, i) => {
+            const p = productBySlug(f.product);
+            return (
+              <li>
+                <a href={`/${f.slug}`} class="feat" data-feat={f.slug}>
+                  <span class="label feat__n">0{i + 1}</span>
+                  <span class="feat__t display">{f.nav[0]} <span class="muted">{f.nav[1]}</span></span>
+                  <span class="feat__p label">{p.name}</span>
+                  <Icon name="arrow" size={20} class="feat__arrow" />
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section class="sec paper ig" aria-labelledby="ig-h">
+    <div class="wrap ig__in">
+      <div class="ig__imgs" aria-hidden="true">
+        <div class="ph"><img src="/img/2026/08/10203.webp" alt="" width="1109" height="2400" loading="lazy" decoding="async" /></div>
+        <div class="ph"><img src="/img/2026/08/10208.webp" alt="" width="1109" height="2400" loading="lazy" decoding="async" /></div>
+      </div>
+      <div class="ig__copy">
+        <p class="label kicker" data-reveal>{contact.instagramHandle}</p>
+        <h2 id="ig-h" class="display fs-d3" data-reveal>{instagramBand.title}</h2>
+        <a href={contact.instagram} class="btn" target="_blank" rel="noopener" data-reveal><Icon name="instagram" /> {instagramBand.cta}</a>
+      </div>
+    </div>
+  </section>
+
+  <EnquiryBand />
+</Base>
+
+<style>
+  /* hero */
+  .hero { position: relative; overflow: hidden; padding: calc(var(--hdr) + clamp(28px, 5vw, 64px)) 0 clamp(40px, 5vw, 72px); min-height: min(100svh, 940px); display: grid; align-items: center; }
+  .hero__bg { position: absolute; inset: 0; background: radial-gradient(45% 55% at 72% 50%, rgba(159, 30, 33, 0.38), transparent 70%); }
+  .hero__mark { position: absolute; right: 6%; top: 50%; height: 118%; width: auto; transform: translateY(-50%); color: rgba(159, 30, 33, 0.18); }
+  .hero__grid { position: relative; display: grid; gap: 40px; align-items: center; }
+  .hero__copy { display: grid; gap: 22px; justify-items: start; }
+  .hero__title { display: flex; flex-direction: column; }
+  .hero__sub { letter-spacing: 0.3em; color: var(--muted-on-dark); }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero__phone { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted-on-dark); }
+  .hero__phone:hover { color: var(--text-on-dark); }
+  .hero__media { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr); gap: 14px; align-items: end; }
+  .hero__img { aspect-ratio: 2 / 3; }
+  .hero__img--b { margin-bottom: 14%; }
+  .hero__in { opacity: 1; }
+  :global(.js) .hero__in { opacity: 0; transform: translate3d(0, 18px, 0); animation: heroIn 0.7s var(--ease-out) forwards; animation-delay: calc(var(--i) * 70ms + 120ms); }
+  :global(.js) .hero__img { animation: heroImg 1s var(--ease-out) both; }
+  :global(.js) .hero__img--b { animation-delay: 0.15s; }
+  @keyframes heroIn { to { opacity: 1; transform: none; } }
+  @keyframes heroImg { from { opacity: 0; transform: translate3d(0, 30px, 0) scale(0.98); } to { opacity: 1; transform: none; } }
+  @media (min-width: 960px) { .hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 56px; } }
+  @media (max-width: 959px) { .hero__media { max-width: 520px; } }
+
+  .slide2 { border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
+  .slide2__in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; padding-top: 22px; padding-bottom: 22px; }
+  .slide2__t { font-size: clamp(1.1rem, 0.9rem + 1vw, 1.75rem); }
+  .slide2__in .link-arrow { margin-left: auto; }
+
+  .sec-head { display: grid; gap: 14px; margin-bottom: clamp(32px, 4vw, 56px); }
+
+  /* collections */
+  .cols__grid { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+  .col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; text-decoration: none; color: inherit; background: var(--paper); padding: 14px; align-items: center; }
+  .col__img { aspect-ratio: 4 / 3; }
+  @media (min-width: 1200px) { .col__img { aspect-ratio: 2 / 3; } }
+  .col__body { display: grid; gap: 12px; align-content: center; padding: 0 6px 8px; }
+  .col__body .muted { font-size: 0.95rem; }
+  .col__n { margin-left: 6px; color: var(--muted-on-light); }
+  @media (min-width: 760px) { .cols__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1200px) { .cols__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .col { grid-template-columns: minmax(0, 1fr); align-items: start; } .col__body { padding: 6px 4px 8px; } }
+
+  /* range */
+  .range { overflow: hidden; }
+  .range__head { display: grid; gap: 24px; margin-bottom: clamp(28px, 4vw, 48px); align-items: end; }
+  .range__aside { display: grid; gap: 18px; justify-items: start; max-width: 460px; }
+  @media (min-width: 900px) { .range__head { grid-template-columns: minmax(0, 1fr) auto; } }
+  .range__strip { grid-auto-columns: minmax(200px, 62vw); padding-left: max(var(--gutter), calc((100vw - var(--container)) / 2)); scroll-padding-left: max(var(--gutter), calc((100vw - var(--container)) / 2)); padding-right: var(--gutter); }
+  @media (min-width: 700px) { .range__strip { grid-auto-columns: minmax(220px, 30vw); } }
+  @media (min-width: 1100px) { .range__strip { grid-auto-columns: 280px; } }
+
+  /* founder */
+  .founder__grid { display: grid; gap: 40px; align-items: center; }
+  .founder__photo { max-width: 360px; width: 100%; }
+  .founder__photo img { width: 100%; filter: grayscale(0.15) contrast(1.05); }
+  .founder__copy { display: grid; gap: 24px; justify-items: start; }
+  .founder__q { max-width: 30ch; }
+  .founder__name { font: 800 1.2rem/1 var(--f-display); text-transform: uppercase; font-variation-settings: 'wdth' 125; }
+  .founder__by { display: grid; gap: 6px; padding-left: 16px; border-left: 2px solid var(--red-hot); }
+  @media (min-width: 900px) { .founder__grid { grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr); gap: 80px; } }
+
+  /* testimonials */
+  .tst__grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  .tcard { background: var(--paper); padding: clamp(22px, 2.4vw, 32px); display: grid; gap: 16px; align-content: start; border-top: 3px solid var(--red); }
+  .tcard__q { font-size: 1.02rem; line-height: 1.6; }
+  .tcard__q a { font-weight: 700; color: inherit; }
+  .tcard__q a:hover { color: var(--red); }
+  .tcard__by { display: flex; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line-light); font-weight: 600; }
+  @media (min-width: 700px) { .tst__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .tst__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } .tcard { grid-column: span 2; } .tcard:nth-child(4) { grid-column: 2 / span 2; } }
+
+  /* features */
+  .feats__grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+  .feats__sticky { display: none; }
+  .feats__list { margin: 20px 0 0; border-top: 1px solid var(--line-dark); }
+  .feat { display: grid; grid-template-columns: 40px minmax(0, 1fr) 24px; gap: 4px 14px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line-dark); text-decoration: none; transition: background-color 0.3s, padding 0s; }
+  .feat__n { color: var(--red-hot); }
+  .feat__t { font-size: clamp(1.15rem, 0.9rem + 1.1vw, 1.9rem); line-height: 1.05; }
+  .feat__t .muted { display: block; }
+  .feat__p { grid-column: 2; color: var(--muted-on-dark); }
+  .feat :global(.feat__arrow) { grid-column: 3; grid-row: 1 / span 2; transition: transform 0.25s var(--ease); }
+  .feat:hover :global(.feat__arrow), .feat.is-active :global(.feat__arrow) { transform: translateX(4px); color: var(--red-hot); }
+  .feat:hover .feat__t, .feat.is-active .feat__t { color: #fff; }
+  @media (min-width: 960px) {
+    .feats__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: 72px; align-items: start; }
+    .feats__sticky { display: block; position: sticky; top: calc(var(--hdr) + 32px); aspect-ratio: 2 / 3; max-height: calc(100vh - var(--hdr) - 64px); }
+    .feats__img { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s var(--ease); }
+    .feats__img.is-on { opacity: 1; }
+  }
+
+  /* instagram */
+  .ig__in { display: grid; gap: 36px; align-items: center; }
+  .ig__imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 520px; }
+  .ig__imgs .ph { aspect-ratio: 3 / 5; }
+  .ig__imgs .ph:last-child { margin-top: 15%; }
+  .ig__copy { display: grid; gap: 22px; justify-items: start; }
+  @media (min-width: 900px) { .ig__in { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 80px; } }
+</style>
+
+<script>
+  // Features: highlight the row in the middle band of the screen and crossfade the sticky photo
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-feat]'));
+  const imgs = Array.from(document.querySelectorAll<HTMLElement>('[data-feat-img]'));
+  if (rows.length && imgs.length) {
+    const set = (slug: string) => {
+      rows.forEach((r) => r.classList.toggle('is-active', r.dataset.feat === slug));
+      imgs.forEach((i) => i.classList.toggle('is-on', i.dataset.featImg === slug));
+    };
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && set((e.target as HTMLElement).dataset.feat!)), { rootMargin: '-48% 0px -48% 0px' });
+    rows.forEach((r) => { io.observe(r); r.addEventListener('mouseenter', () => set(r.dataset.feat!)); });
+  }
+  // drag-to-scroll for the range strip (desktop mouse)
+  document.querySelectorAll<HTMLElement>('[data-drag]').forEach((el) => {
+    let down = false, sx = 0, sl = 0, moved = false;
+    el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = el.scrollLeft; });
+    window.addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 5) moved = true; el.scrollLeft = sl - dx; });
+    window.addEventListener('pointerup', () => { down = false; });
+    el.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+  });
+</script>
