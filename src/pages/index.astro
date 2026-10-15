@@ -24,8 +24,9 @@ const [s1, s2] = heroSlides;
         <a href={contact.phoneHref} class="hero__phone label hero__in" style="--i:4"><Icon name="phone" size={16} /> {contact.phone}</a>
       </div>
       <div class="hero__media">
-        <div class="ph hero__img hero__img--a"><img src="/img/2026/06/stealth1.webp" alt="HAVOC Stealth with grey dial and red seconds hand" width="1024" height="1536" fetchpriority="high" /></div>
-        <div class="ph hero__img hero__img--b"><img src="/img/2026/07/jtac2.webp" alt="HAVOC JTAC on the wrist in the desert" width="1024" height="1536" /></div>
+        <span class="hero__floor" aria-hidden="true"></span>
+        <a href="/product/havoc-op-herrick" class="hero__img hero__img--b"><img src="/img/cutout/13481.webp" alt="HAVOC OP HERRICK" width="819" height="1495" /></a>
+        <a href="/product/havoc-challenger-gmt" class="hero__img hero__img--a"><img src="/img/cutout/9374.webp" alt="HAVOC Challenger GMT" width="939" height="1536" fetchpriority="high" /></a>
       </div>
     </div>
   </section>
@@ -179,9 +180,19 @@ const [s1, s2] = heroSlides;
   .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
   .hero__phone { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted-on-dark); }
   .hero__phone:hover { color: var(--text-on-dark); }
-  .hero__media { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr); gap: 14px; align-items: end; }
-  .hero__img { aspect-ratio: 2 / 3; }
-  .hero__img--b { margin-bottom: 14%; }
+  .hero__media { position: relative; height: clamp(380px, 46vw, 680px); width: 100%; }
+  .hero__img { position: absolute; display: block; }
+  .hero__img img { width: 100%; height: auto; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.65)); }
+  .hero__img--a { height: 100%; left: 30%; top: 0; aspect-ratio: 939 / 1536; z-index: 2; }
+  .hero__img--a img { height: 100%; width: auto; }
+  .hero__img--b { height: 78%; left: 4%; top: 14%; aspect-ratio: 819 / 1495; rotate: -9deg; z-index: 1; }
+  .hero__img--b img { height: 100%; width: auto; filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.7)) brightness(0.92); }
+  .hero__floor { position: absolute; left: 10%; right: 0; bottom: -4%; height: 18%; background: radial-gradient(50% 50% at 50% 50%, rgba(200, 40, 44, 0.35), transparent 70%); filter: blur(6px); }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__img--a img { animation: float 7s ease-in-out 1.2s infinite; }
+    .hero__img--b img { animation: float 8s ease-in-out 1.6s infinite reverse; }
+  }
+  @keyframes float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -10px, 0); } }
   .hero__in { opacity: 1; }
   :global(.js) .hero__in { opacity: 0; transform: translate3d(0, 18px, 0); animation: heroIn 0.7s var(--ease-out) forwards; animation-delay: calc(var(--i) * 70ms + 120ms); }
   :global(.js) .hero__img { animation: heroImg 1s var(--ease-out) both; }
@@ -189,7 +200,7 @@ const [s1, s2] = heroSlides;
   @keyframes heroIn { to { opacity: 1; transform: none; } }
   @keyframes heroImg { from { opacity: 0; transform: translate3d(0, 30px, 0) scale(0.98); } to { opacity: 1; transform: none; } }
   @media (min-width: 960px) { .hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 56px; } }
-  @media (max-width: 959px) { .hero__media { max-width: 520px; } }
+  @media (max-width: 959px) { .hero__media { max-width: 520px; height: clamp(340px, 100vw, 520px); } }
 
   .slide2 { border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
   .slide2__in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; padding-top: 22px; padding-bottom: 22px; }
