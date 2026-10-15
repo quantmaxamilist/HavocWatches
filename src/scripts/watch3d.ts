@@ -74,25 +74,27 @@ export async function mountWatch({ section, stage, list, replay, onReady }: Opts
   const caseMesh = new THREE.Mesh(new THREE.LatheGeometry(prof, 128), steel);
   caseMesh.rotation.x = Math.PI / 2; caseG.add(caseMesh);
   // lugs: taper from the case into the bracelet width
-  const lugShape = new THREE.Shape(); lugShape.moveTo(-0.5, -0.1); lugShape.lineTo(0.5, -0.1); lugShape.lineTo(0.385, 0.42); lugShape.lineTo(-0.385, 0.42); lugShape.closePath();
+  const lugShape = new THREE.Shape(); lugShape.moveTo(-0.62, -0.1); lugShape.lineTo(0.62, -0.1); lugShape.lineTo(0.54, 0.42); lugShape.lineTo(-0.54, 0.42); lugShape.closePath();
   const lugGeo = new THREE.ExtrudeGeometry(lugShape, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 3 });
   [1, -1].forEach((sgn) => { const l = new THREE.Mesh(lugGeo, steelBrushed); l.position.set(0, sgn * 0.86, -0.19); if (sgn < 0) l.rotation.z = Math.PI; caseG.add(l); });
   // crown with knurled edge
   const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.2, 40, 1), steelBrushed);
   crown.rotation.z = Math.PI / 2; crown.position.set(1.17, 0, -0.04); caseG.add(crown);
   for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2; const k = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.018, 0.018), steel); k.position.set(1.17, Math.cos(a) * 0.152, -0.04 + Math.sin(a) * 0.152); caseG.add(k); }
-  // bracelet: three-row Oyster-style links, chained so each row hinges off the one before
-  const LEN = 0.26, outerLink = new RoundedBoxGeometry(0.235, LEN, 0.12, 3, 0.035), midLink = new RoundedBoxGeometry(0.25, LEN * 0.96, 0.13, 3, 0.04);
+  // bracelet: three-row Oyster-style links at the real width (420px of the photo ≈ 1.07 units at the lugs,
+  // tapering to ~0.9), chained so each row hinges smoothly off the one before
+  const LEN = 0.25, STEP = 0.235;
+  const outerLink = new RoundedBoxGeometry(0.37, LEN, 0.15, 4, 0.05), midLink = new RoundedBoxGeometry(0.33, LEN * 0.94, 0.165, 4, 0.06);
   [1, -1].forEach((sgn) => {
-    let jy = 1.27, jz = -0.09, ang = 0.02;
-    for (let i = 0; i < 7; i++) {
-      const dy = Math.cos(ang) * LEN, dz = -Math.sin(ang) * LEN;
+    let jy = 1.27, jz = -0.1, ang = 0.0;
+    for (let i = 0; i < 9; i++) {
+      const dy = Math.cos(ang) * STEP, dz = -Math.sin(ang) * STEP;
       const row = new THREE.Group();
-      [-0.245, 0.245].forEach((x) => { const m = new THREE.Mesh(outerLink, steelBrushed); m.position.x = x; row.add(m); });
-      const c = new THREE.Mesh(midLink, steel); c.position.z = 0.008; row.add(c);
-      row.position.set(0, sgn * (jy + dy / 2), jz + dz / 2); row.rotation.x = sgn * ang;
+      [-0.35, 0.35].forEach((x) => { const m = new THREE.Mesh(outerLink, steelBrushed); m.position.x = x; row.add(m); });
+      const c = new THREE.Mesh(midLink, steel); c.position.z = 0.012; row.add(c);
+      row.position.set(0, sgn * (jy + dy / 2), jz + dz / 2); row.rotation.x = sgn * ang; row.scale.x = 1 - Math.min(i, 6) * 0.025;
       caseG.add(row);
-      jy += dy; jz += dz; ang += 0.14;
+      jy += dy; jz += dz; ang += 0.11;
     }
   });
 
