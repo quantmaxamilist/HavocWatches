@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { gsap } from 'gsap';
 
 type Opts = { section: HTMLElement; stage: HTMLElement; list: HTMLElement; replay: HTMLButtonElement; onReady?: () => void };
@@ -19,7 +20,7 @@ function markShape(size: number) {
   return shape;
 }
 
-export function mountWatch({ section, stage, list, replay, onReady }: Opts) {
+export async function mountWatch({ section, stage, list, replay, onReady }: Opts) {
   const host = stage.querySelector<HTMLElement>('[data-wb-canvas]')!;
   const isPhone = window.matchMedia('(max-width: 899px)').matches;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -36,7 +37,7 @@ export function mountWatch({ section, stage, list, replay, onReady }: Opts) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-  camera.position.set(0, 0, 9.2);
+  camera.position.set(0, 0, 10.4);
 
   const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3, 4, 5); scene.add(key);
   const rim = new THREE.PointLight(0xc8282c, 26, 12, 1.6); rim.position.set(-2.6, 1.8, -1.5); scene.add(rim);
@@ -58,71 +59,118 @@ export function mountWatch({ section, stage, list, replay, onReady }: Opts) {
   const parts: Record<string, THREE.Group> = {};
   const mk = (name: string) => { const g = new THREE.Group(); g.name = name; parts[name] = g; watch.add(g); return g; };
 
-  // CASE (+ lugs, crown, caseback, straps)
+  // ── Replica of the HAVOC Challenger GMT ──
+  // Dial and bezel are textures cut from the real product photo (hands painted out),
+  // so every print, numeral and the date window are the real watch. 1 unit = 410px of that photo.
+  const PX = 1.04 / 410;
+  const texLoader = new THREE.TextureLoader();
+  const loadTex = (u: string) => new Promise<THREE.Texture>((res, rej) => texLoader.load(u, (t) => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); res(t); }, undefined, rej));
+  const [dialTex, bezelTex] = await Promise.all([loadTex('/img/gmt-dial.webp'), loadTex('/img/gmt-bezel.webp')]);
+  const printed = (map: THREE.Texture) => new THREE.MeshStandardMaterial({ map, metalness: 0.15, roughness: 0.35, transparent: false });
+
+  // CASE (+ lugs, crown, Oyster-style bracelet) — highlighted with the bezel as "Case"
   const caseG = mk('case');
-  const prof = [[0, -0.24], [0.96, -0.24], [1.02, -0.2], [1.06, -0.1], [1.07, 0.06], [1.04, 0.14], [0.98, 0.17], [0.86, 0.17], [0.86, 0.05], [0, 0.05]].map(([x, y]) => new THREE.Vector2(x, y));
-  const caseMesh = new THREE.Mesh(new THREE.LatheGeometry(prof, 96), steel);
+  const prof = [[0, -0.24], [0.98, -0.24], [1.04, -0.2], [1.08, -0.1], [1.09, 0.06], [1.07, 0.14], [1.02, 0.17], [0.86, 0.17], [0.86, 0.05], [0, 0.05]].map(([x, y]) => new THREE.Vector2(x, y));
+  const caseMesh = new THREE.Mesh(new THREE.LatheGeometry(prof, 128), steel);
   caseMesh.rotation.x = Math.PI / 2; caseG.add(caseMesh);
-  const lugGeo = new THREE.BoxGeometry(0.15, 0.42, 0.2);
-  [[-0.5, 0.98], [0.5, 0.98], [-0.5, -0.98], [0.5, -0.98]].forEach(([x, y]) => { const l = new THREE.Mesh(lugGeo, steelBrushed); l.position.set(x, y, -0.02); caseG.add(l); });
-  const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.2, 32), steelBrushed);
-  crown.rotation.z = Math.PI / 2; crown.position.set(1.15, 0, -0.02); caseG.add(crown);
-  const strapGeo = new THREE.BoxGeometry(0.84, 1.05, 0.1);
-  [1, -1].forEach((s) => { const st = new THREE.Mesh(strapGeo, rubber); st.position.set(0, s * 1.62, -0.12); st.rotation.x = s * 0.3; caseG.add(st); });
+  // lugs: taper from the case into the bracelet width
+  const lugShape = new THREE.Shape(); lugShape.moveTo(-0.5, -0.1); lugShape.lineTo(0.5, -0.1); lugShape.lineTo(0.385, 0.42); lugShape.lineTo(-0.385, 0.42); lugShape.closePath();
+  const lugGeo = new THREE.ExtrudeGeometry(lugShape, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 3 });
+  [1, -1].forEach((sgn) => { const l = new THREE.Mesh(lugGeo, steelBrushed); l.position.set(0, sgn * 0.86, -0.19); if (sgn < 0) l.rotation.z = Math.PI; caseG.add(l); });
+  // crown with knurled edge
+  const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.2, 40, 1), steelBrushed);
+  crown.rotation.z = Math.PI / 2; crown.position.set(1.17, 0, -0.04); caseG.add(crown);
+  for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2; const k = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.018, 0.018), steel); k.position.set(1.17, Math.cos(a) * 0.152, -0.04 + Math.sin(a) * 0.152); caseG.add(k); }
+  // bracelet: three-row Oyster-style links, chained so each row hinges off the one before
+  const LEN = 0.26, outerLink = new RoundedBoxGeometry(0.235, LEN, 0.12, 3, 0.035), midLink = new RoundedBoxGeometry(0.25, LEN * 0.96, 0.13, 3, 0.04);
+  [1, -1].forEach((sgn) => {
+    let jy = 1.27, jz = -0.09, ang = 0.02;
+    for (let i = 0; i < 7; i++) {
+      const dy = Math.cos(ang) * LEN, dz = -Math.sin(ang) * LEN;
+      const row = new THREE.Group();
+      [-0.245, 0.245].forEach((x) => { const m = new THREE.Mesh(outerLink, steelBrushed); m.position.x = x; row.add(m); });
+      const c = new THREE.Mesh(midLink, steel); c.position.z = 0.008; row.add(c);
+      row.position.set(0, sgn * (jy + dy / 2), jz + dz / 2); row.rotation.x = sgn * ang;
+      caseG.add(row);
+      jy += dy; jz += dz; ang += 0.14;
+    }
+  });
 
-  // BEZEL (highlighted with the case)
+  // BEZEL — black ceramic insert textured from the real 24-hour bezel, on a knurled steel ring
   const bezelG = mk('bezel');
-  const bprof = [[0.82, 0.17], [1.04, 0.17], [1.05, 0.24], [1.0, 0.29], [0.84, 0.29], [0.82, 0.26]].map(([x, y]) => new THREE.Vector2(x, y));
-  const bezel = new THREE.Mesh(new THREE.LatheGeometry(bprof, 96), ceramic); bezel.rotation.x = Math.PI / 2; bezelG.add(bezel);
-  const tickGeo = new THREE.BoxGeometry(0.022, 0.08, 0.01);
-  for (let i = 0; i < 60; i++) {
-    if (i % 5 !== 0) continue;
-    const a = (i / 60) * Math.PI * 2;
-    const t = new THREE.Mesh(tickGeo, i === 0 ? red : lume);
-    t.position.set(Math.sin(a) * 0.93, Math.cos(a) * 0.93, 0.295); t.rotation.z = -a; t.scale.y = i % 15 === 0 ? 1.6 : 1; bezelG.add(t);
-  }
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(1.085, 1.085, 0.12, 120, 1, true), steelBrushed);
+  coin.rotation.x = Math.PI / 2; coin.position.z = 0.23; bezelG.add(coin);
+  for (let i = 0; i < 120; i++) { const a = (i / 120) * Math.PI * 2; const k = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.014, 0.12), steel); k.position.set(Math.cos(a) * 1.09, Math.sin(a) * 1.09, 0.23); bezelG.add(k); }
+  const insert = new THREE.Mesh(new THREE.RingGeometry(320 * PX, 410 * PX, 160, 1), printed(bezelTex));
+  insert.position.z = 0.292; bezelG.add(insert);
+  // inner flange (rehaut) is printed in the dial texture; add a thin steel wall so the bezel has depth
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(320 * PX, 320 * PX, 0.12, 120, 1, true), steel);
+  wall.rotation.x = Math.PI / 2; wall.position.z = 0.23; bezelG.add(wall);
 
-  // DIAL (+ indices)
+  // DIAL — real dial print (markers, HAVOC, flag, GMT AUTOMATIC 200m/660ft, date window)
   const dialG = mk('dial');
-  const dial = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.82, 0.04, 96), dialMat); dial.rotation.x = Math.PI / 2; dial.position.z = 0.07; dialG.add(dial);
-  const idxGeo = new THREE.BoxGeometry(0.07, 0.17, 0.03);
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    const m = new THREE.Mesh(idxGeo, lume);
-    m.position.set(Math.sin(a) * 0.66, Math.cos(a) * 0.66, 0.105); m.rotation.z = -a;
-    if (i % 3 === 0) m.scale.set(1.35, 1.3, 1);
-    dialG.add(m);
-  }
-  const minGeo = new THREE.BoxGeometry(0.008, 0.04, 0.01);
-  for (let i = 0; i < 60; i++) { if (i % 5 === 0) continue; const a = (i / 60) * Math.PI * 2; const m = new THREE.Mesh(minGeo, handMat); m.position.set(Math.sin(a) * 0.77, Math.cos(a) * 0.77, 0.095); m.rotation.z = -a; dialG.add(m); }
+  const dial = new THREE.Mesh(new THREE.CircleGeometry(330 * PX, 160), printed(dialTex));
+  dial.position.z = 0.09; dialG.add(dial);
 
-  // LOGO (HAVOC mark, extruded, red)
+  // LOGO — the red HAVOC mark, applied at its real position on the dial
   const logoG = mk('logo');
-  const logo = new THREE.Mesh(new THREE.ExtrudeGeometry(markShape(0.24), { depth: 0.02, bevelEnabled: false }), red);
-  logo.position.set(0, 0.33, 0.09); logoG.add(logo);
+  const logo = new THREE.Mesh(new THREE.ExtrudeGeometry(markShape(66 * PX), { depth: 0.012, bevelEnabled: false }), red);
+  logo.position.set(-2.5 * PX, 150 * PX, 0.092); logoG.add(logo);
 
-  // HANDS (10:09)
+  // HANDS — shapes and positions measured from the product photo
   const handsG = mk('hands');
-  const hand = (len: number, w: number, mat: THREE.Material, angle: number, z: number, tail = 0) => {
-    const g = new THREE.Group();
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, len + tail, 0.014), mat); m.position.y = (len - tail) / 2; g.add(m);
-    g.rotation.z = -angle; g.position.z = z; handsG.add(g); return g;
-  };
-  hand(0.42, 0.075, handMat, (10.15 / 12) * Math.PI * 2, 0.13);
-  hand(0.62, 0.055, handMat, (9 / 60) * Math.PI * 2, 0.15);
-  hand(0.7, 0.014, red, (35 / 60) * Math.PI * 2, 0.17, 0.18);
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.03, 24), red); cap.rotation.x = Math.PI / 2; cap.position.z = 0.18; handsG.add(cap);
+  const lumeHand = new THREE.MeshStandardMaterial({ color: 0xf4f3ee, metalness: 0.1, roughness: 0.35, emissive: 0x1d1d1a });
+  const frame = handMat;
+  const at = (deg: number, z: number) => { const g = new THREE.Group(); g.rotation.z = -THREE.MathUtils.degToRad(deg); g.position.z = z; handsG.add(g); return g; };
+  const flat = (shape: THREE.Shape, mat: THREE.Material, d = 0.012) => new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false, curveSegments: 24 }), mat);
+  // hour: Mercedes hand
+  {
+    const g = at(302, 0.12);
+    const L = 150 * PX, rc = 34 * PX, w = 13 * PX;
+    const shaft = new THREE.Shape(); shaft.moveTo(-w, 0); shaft.lineTo(w, 0); shaft.lineTo(w * 0.8, L - rc * 1.6); shaft.lineTo(-w * 0.8, L - rc * 1.6); shaft.closePath();
+    g.add(flat(shaft, frame));
+    const ring = new THREE.Shape(); ring.absarc(0, L - rc, rc, 0, Math.PI * 2, false); const hole = new THREE.Path(); hole.absarc(0, L - rc, rc - 5 * PX, 0, Math.PI * 2, true); ring.holes.push(hole);
+    g.add(flat(ring, frame));
+    for (let i = 0; i < 3; i++) { const sp = new THREE.Mesh(new THREE.BoxGeometry(4 * PX, rc, 0.012), frame); sp.geometry.translate(0, rc / 2, 0.006); sp.position.y = L - rc; sp.rotation.z = (i * 2 * Math.PI) / 3; g.add(sp); }
+    const tip = new THREE.Shape(); tip.moveTo(-9 * PX, L - 4 * PX); tip.lineTo(9 * PX, L - 4 * PX); tip.lineTo(0, L + 26 * PX); tip.closePath(); g.add(flat(tip, frame));
+    const lumeStrip = new THREE.Mesh(new THREE.BoxGeometry(10 * PX, L - rc * 2 - 30 * PX, 0.004), lumeHand); lumeStrip.position.set(0, 30 * PX + (L - rc * 2 - 30 * PX) / 2, 0.013); g.add(lumeStrip);
+  }
+  // minute: long sword
+  {
+    const g = at(52, 0.14);
+    const L = 262 * PX, w = 11 * PX;
+    const sw = new THREE.Shape(); sw.moveTo(-w, 0); sw.lineTo(w, 0); sw.lineTo(w, L - 40 * PX); sw.lineTo(0, L); sw.lineTo(-w, L - 40 * PX); sw.closePath();
+    g.add(flat(sw, frame));
+    const lumeStrip = new THREE.Mesh(new THREE.BoxGeometry(11 * PX, L - 80 * PX, 0.004), lumeHand); lumeStrip.position.set(0, 40 * PX + (L - 80 * PX) / 2, 0.013); g.add(lumeStrip);
+  }
+  // GMT: thin red hand with white arrow tip
+  {
+    const g = at(121, 0.16);
+    const L = 258 * PX;
+    const rod = new THREE.Mesh(new THREE.BoxGeometry(5 * PX, L - 34 * PX, 0.01), red); rod.position.y = (L - 34 * PX) / 2; g.add(rod);
+    const tri = new THREE.Shape(); tri.moveTo(-22 * PX, L - 40 * PX); tri.lineTo(22 * PX, L - 40 * PX); tri.lineTo(0, L); tri.closePath(); g.add(flat(tri, lumeHand, 0.01));
+  }
+  // seconds: thin steel with lume lollipop and counterweight
+  {
+    const g = at(222.7, 0.18);
+    const L = 264 * PX, back = 72 * PX;
+    const rod = new THREE.Mesh(new THREE.BoxGeometry(4 * PX, L + back, 0.008), frame); rod.position.y = (L - back) / 2; g.add(rod);
+    const pop = new THREE.Mesh(new THREE.CylinderGeometry(13 * PX, 13 * PX, 0.01, 28), frame); pop.rotation.x = Math.PI / 2; pop.position.y = 150 * PX; g.add(pop);
+    const popL = new THREE.Mesh(new THREE.CylinderGeometry(9 * PX, 9 * PX, 0.012, 28), lumeHand); popL.rotation.x = Math.PI / 2; popL.position.set(0, 150 * PX, 0.002); g.add(popL);
+    const cw = new THREE.Mesh(new THREE.CylinderGeometry(12 * PX, 12 * PX, 0.01, 28), frame); cw.rotation.x = Math.PI / 2; cw.position.y = -back + 12 * PX; g.add(cw);
+  }
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(20 * PX, 22 * PX, 0.03, 32), handMat); cap.rotation.x = Math.PI / 2; cap.position.z = 0.19; handsG.add(cap);
 
   // CRYSTAL
   const crystalG = mk('crystal');
-  const crystal = new THREE.Mesh(new THREE.CylinderGeometry(0.84, 0.84, 0.03, 96), glass); crystal.rotation.x = Math.PI / 2; crystal.position.z = 0.29; crystalG.add(crystal);
+  const crystal = new THREE.Mesh(new THREE.CylinderGeometry(322 * PX, 322 * PX, 0.03, 96), glass); crystal.rotation.x = Math.PI / 2; crystal.position.z = 0.27; crystalG.add(crystal);
 
   // per-part highlight: clone materials so emissive can be set per group
   const groups: Record<PartKey, THREE.Group[]> = { case: [caseG, bezelG], dial: [dialG], logo: [logoG], hands: [handsG] };
   (Object.keys(groups) as PartKey[]).forEach((k) => groups[k].forEach((g) => g.traverse((o: any) => { if (o.isMesh) { o.material = o.material.clone(); o.userData.part = k; o.userData.baseEm = o.material.emissive?.clone(); } })));
 
   // final pose + exploded offsets (along the dial normal, one clean move)
-  const finalRot = new THREE.Euler(-0.42, 0.52, 0.06);
+  const finalRot = new THREE.Euler(-0.3, 0.36, 0.03);
   const startRot = new THREE.Euler(-0.95, 1.05, -0.12);
   const explode: Record<string, { z: number; r: number }> = {
     case: { z: 0, r: 0 }, bezel: { z: 0.9, r: -0.9 }, dial: { z: 1.65, r: 0.4 }, logo: { z: 2.35, r: 0 }, hands: { z: 3.0, r: 1.4 }, crystal: { z: 3.7, r: 0 },
